@@ -1,6 +1,6 @@
-# Project Structure
+## Project Structure
 
-```md
+```
 .
 ├── ...
 ├── <language>              
@@ -9,3 +9,7 @@
 │       └── ... 
 └── ...
 ```
+
+## Disclaimer
+1. Do not push to main. Create a new branch and make prs. 
+2. Files should be documented.
