@@ -1,4 +1,4 @@
-# inspyrd NFT mint Solana contract
+# inspyrd NFT Auction Solana contract
 
 - Install Rust from https://rustup.rs/
 - Install Solana from https://docs.solana.com/cli/install-solana-cli-tools
