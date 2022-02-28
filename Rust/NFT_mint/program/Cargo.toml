@@ -4,7 +4,7 @@ name = "mpl-inspyrd-machine"
 version = "1.0.0"
 description = "NFT Inspyrd Machine v2: programmatic and trustless NFT drops."
 license = "Apache-2.0"
-edition = "2022"
+edition = "2018"
 readme = "README.md"
 
 [lib]

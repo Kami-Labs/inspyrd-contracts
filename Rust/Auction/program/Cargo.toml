@@ -3,7 +3,7 @@ name = "mpl-auction"
 version = "1.0.0"
 description = "Solana Auction Program"
 license = "Apache-2.0"
-edition = "2022"
+edition = "2018"
 
 [features]
 no-entrypoint = []
