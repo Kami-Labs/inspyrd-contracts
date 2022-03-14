@@ -1,0 +1,14 @@
+node_modules
+test - Copy
+
+#Hardhat files
+cache
+.env
+artifacts
+coverage
+coverage.json
+secretsManager.js
+.DS_Store
+README.md
+yarn.lock
+yarn-error.log
