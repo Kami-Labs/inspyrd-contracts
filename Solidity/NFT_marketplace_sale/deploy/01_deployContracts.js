@@ -3,13 +3,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  let nftMint = await deploy("NFTMint", {
+  let nftSale = await deploy("NFTMarketPlaceSale", {
     from: deployer,
     log: true,
   });
   try {
     await hre.run("verify:verify", {
-        address: nftMint.address,
+        address: nftSale.address,
         constructorArguments: [],
     });
    
@@ -17,4 +17,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       console.log(err)
   }
 };
-module.exports.tags = ["all", "Mint"];
+module.exports.tags = ["all", "Sale"];
