@@ -8,7 +8,7 @@ async function main() {
   const NFTMint = await ethers.getContractFactory("NFTMint");
   const nftMint = await NFTMint.deploy("NFTMint", "INT");
 
-  //verify: npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS
+  //verify: npx hardhat verify --constructor-args arguments.js --network rinkeby DEPLOYED_CONTRACT_ADDRESS
   console.log("nftMint address:", nftMint.address);
 }
 

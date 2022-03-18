@@ -6,10 +6,10 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const NFTSale = await ethers.getContractFactory("NFTMarketPlaceSale");
-  const nftSale = await NFTSale.deploy("NFTMint", "INT");
+  const nftSale = await NFTSale.deploy();
 
   //verify: npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS
-  console.log("nftMint address:", nftSale.address);
+  console.log("nftSale address:", nftSale.address);
 }
 
 main()

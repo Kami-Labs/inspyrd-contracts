@@ -1,1 +1,1 @@
-module.exports = ["NFT mint", "INT"];
+module.exports = ["NFTMint", "INT"];
