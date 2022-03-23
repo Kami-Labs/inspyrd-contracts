@@ -4,7 +4,6 @@ test - Copy
 #Hardhat files
 cache
 .env
-artifacts
 coverage
 coverage.json
 secretsManager.js
