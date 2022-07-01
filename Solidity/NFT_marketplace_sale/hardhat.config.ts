@@ -48,10 +48,10 @@ const config: HardhatUserConfig = {
       gasPrice: "auto",
       gasMultiplier: 2,
     },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${infuraApiKey}`,
-      accounts: [`0x${privateKey}`],
-    }
+    // rinkeby: {
+    //   url: `https://rinkeby.infura.io/v3/${infuraApiKey}`,
+    //   accounts: [`0x${privateKey}`],
+    // }
   },
   paths: {
     artifacts: "./artifacts",
@@ -64,7 +64,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: "0.8.11",
         settings: {
           metadata: {
             bytecodeHash: "none",

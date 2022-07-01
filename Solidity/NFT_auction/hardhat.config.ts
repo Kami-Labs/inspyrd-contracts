@@ -48,14 +48,14 @@ const config: HardhatUserConfig = {
       gasPrice: "auto",
       gasMultiplier: 2,
     },
-    mainnet: {
-      url: `https://bsc-dataseed.binance.org/`,
-      accounts: [`0x${privateKey}`],
-    },
-    testnet: {
-      url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
-      accounts: [`0x${privateKey}`],
-    },
+    // mainnet: {
+    //   url: `https://bsc-dataseed.binance.org/`,
+    //   accounts: [`0x${privateKey}`],
+    // },
+    // testnet: {
+    //   url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+    //   accounts: [`0x${privateKey}`],
+    // },
   },
   paths: {
     artifacts: "./artifacts",
@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: "0.8.11",
         settings: {
           metadata: {
             bytecodeHash: "none",

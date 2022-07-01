@@ -1,15 +1,20 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.4;
+pragma solidity 0.8.11;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /// @title An Auction Contract for bidding and selling single and batched NFTs
 /// @author Avo Labs GmbH
 /// @notice This contract can be used for auctioning any NFTs, and accepts any ERC20 token as payment
-contract NFTAuction {
+contract NFTAuction is ReentrancyGuard, ERC721Holder {
+    using SafeERC20 for IERC20;
+
     mapping(address => mapping(uint256 => Auction)) public nftContractAuctions;
     mapping(address => uint256) failedTransferCredits;
     //Each Auction is unique to each NFT (contract + id pairing).
@@ -32,10 +37,10 @@ contract NFTAuction {
     /*
      * Default values that are used if not specified by the NFT seller.
      */
-    uint32 public defaultBidIncreasePercentage;
-    uint32 public minimumSettableIncreasePercentage;
-    uint32 public maximumMinPricePercentage;
-    uint32 public defaultAuctionBidPeriod;
+    uint32 public immutable defaultBidIncreasePercentage;
+    uint32 public immutable minimumSettableIncreasePercentage;
+    uint32 public immutable maximumMinPricePercentage;
+    uint32 public immutable defaultAuctionBidPeriod;
 
     /*           EVENTS            */
 
@@ -124,7 +129,7 @@ contract NFTAuction {
     );
     event HighestBidTaken(address nftContractAddress, uint256 tokenId);
     /********************************** END EVENTS **********************************/
-    
+
     /* MODIFIERS */
 
     modifier isAuctionNotStartedByOwner(
@@ -502,7 +507,7 @@ contract NFTAuction {
     }
 
     /**********************************  END AUCTION CHECK FUNCTIONS  **********************************/
-    
+
     /* DEFAULT GETTER FUNCTIONS  */
     /*****************************************************************
      * These functions check if the applicable auction parameter has *
@@ -960,7 +965,7 @@ contract NFTAuction {
             _tokenId
         ].ERC20Token;
         if (_isERC20Auction(auctionERC20Token)) {
-            IERC20(auctionERC20Token).transferFrom(
+            IERC20(auctionERC20Token).safeTransferFrom(
                 msg.sender,
                 address(this),
                 _tokenAmount
@@ -1103,7 +1108,7 @@ contract NFTAuction {
             _tokenId
         ].ERC20Token;
         if (_isERC20Auction(auctionERC20Token)) {
-            IERC20(auctionERC20Token).transfer(_recipient, _amount);
+            IERC20(auctionERC20Token).safeTransfer(_recipient, _amount);
         } else {
             // attempt to send the funds to the recipient
             (bool success, ) = payable(_recipient).call{
@@ -1132,18 +1137,26 @@ contract NFTAuction {
 
     function withdrawAuction(address _nftContractAddress, uint256 _tokenId)
         external
+        nonReentrant
     {
         //only the NFT owner can prematurely close and auction
         require(
             IERC721(_nftContractAddress).ownerOf(_tokenId) == msg.sender,
             "Not NFT owner"
         );
+
+        require(
+            !_isABidMade(_nftContractAddress, _tokenId),
+            "A bid has been made!"
+        );
+
         _resetAuction(_nftContractAddress, _tokenId);
         emit AuctionWithdrawn(_nftContractAddress, _tokenId, msg.sender);
     }
 
     function withdrawBid(address _nftContractAddress, uint256 _tokenId)
         external
+        nonReentrant
         minimumBidNotMade(_nftContractAddress, _tokenId)
     {
         address nftHighestBidder = nftContractAuctions[_nftContractAddress][

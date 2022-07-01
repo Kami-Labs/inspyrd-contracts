@@ -22,16 +22,21 @@ export interface NFTAuctionInterface extends utils.Interface {
   contractName: "NFTAuction";
   functions: {
     "createNewNftAuction(address,uint256,address,uint128,uint128,uint32,uint32,address[],uint32[])": FunctionFragment;
+    "createSale(address,uint256,address,uint128,address,address[],uint32[])": FunctionFragment;
     "defaultAuctionBidPeriod()": FunctionFragment;
     "defaultBidIncreasePercentage()": FunctionFragment;
     "makeBid(address,uint256,address,uint128)": FunctionFragment;
     "makeCustomBid(address,uint256,address,uint128,address)": FunctionFragment;
     "maximumMinPricePercentage()": FunctionFragment;
-    "minimumBidPercentage()": FunctionFragment;
-    "nftAuctions(address,uint256)": FunctionFragment;
+    "minimumSettableIncreasePercentage()": FunctionFragment;
+    "nftContractAuctions(address,uint256)": FunctionFragment;
+    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOfNFT(address,uint256)": FunctionFragment;
     "settleAuction(address,uint256)": FunctionFragment;
     "takeHighestBid(address,uint256)": FunctionFragment;
+    "updateBuyNowPrice(address,uint256,uint128)": FunctionFragment;
+    "updateMinimumPrice(address,uint256,uint128)": FunctionFragment;
+    "updateWhitelistedBuyer(address,uint256,address)": FunctionFragment;
     "withdrawAllFailedCredits()": FunctionFragment;
     "withdrawAuction(address,uint256)": FunctionFragment;
     "withdrawBid(address,uint256)": FunctionFragment;
@@ -47,6 +52,18 @@ export interface NFTAuctionInterface extends utils.Interface {
       BigNumberish,
       BigNumberish,
       BigNumberish,
+      string[],
+      BigNumberish[]
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createSale",
+    values: [
+      string,
+      BigNumberish,
+      string,
+      BigNumberish,
+      string,
       string[],
       BigNumberish[]
     ]
@@ -72,12 +89,16 @@ export interface NFTAuctionInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "minimumBidPercentage",
+    functionFragment: "minimumSettableIncreasePercentage",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "nftAuctions",
+    functionFragment: "nftContractAuctions",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC721Received",
+    values: [string, string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "ownerOfNFT",
@@ -90,6 +111,18 @@ export interface NFTAuctionInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "takeHighestBid",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateBuyNowPrice",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateMinimumPrice",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateWhitelistedBuyer",
+    values: [string, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawAllFailedCredits",
@@ -108,6 +141,7 @@ export interface NFTAuctionInterface extends utils.Interface {
     functionFragment: "createNewNftAuction",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "createSale", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "defaultAuctionBidPeriod",
     data: BytesLike
@@ -126,11 +160,15 @@ export interface NFTAuctionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "minimumBidPercentage",
+    functionFragment: "minimumSettableIncreasePercentage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "nftAuctions",
+    functionFragment: "nftContractAuctions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC721Received",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOfNFT", data: BytesLike): Result;
@@ -140,6 +178,18 @@ export interface NFTAuctionInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "takeHighestBid",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateBuyNowPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateMinimumPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateWhitelistedBuyer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -161,9 +211,13 @@ export interface NFTAuctionInterface extends utils.Interface {
     "AuctionWithdrawn(address,uint256,address)": EventFragment;
     "BidMade(address,uint256,address,uint256,address,uint256)": EventFragment;
     "BidWithdrawn(address,uint256,address)": EventFragment;
+    "BuyNowPriceUpdated(address,uint256,uint128)": EventFragment;
     "HighestBidTaken(address,uint256)": EventFragment;
+    "MinimumPriceUpdated(address,uint256,uint256)": EventFragment;
     "NFTTransferredAndSellerPaid(address,uint256,address,uint128,address,address)": EventFragment;
     "NftAuctionCreated(address,uint256,address,address,uint128,uint128,uint32,uint32,address[],uint32[])": EventFragment;
+    "SaleCreated(address,uint256,address,address,uint128,address,address[],uint32[])": EventFragment;
+    "WhitelistedBuyerUpdated(address,uint256,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AuctionPeriodUpdated"): EventFragment;
@@ -171,11 +225,15 @@ export interface NFTAuctionInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "AuctionWithdrawn"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BidMade"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BidWithdrawn"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "BuyNowPriceUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "HighestBidTaken"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MinimumPriceUpdated"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "NFTTransferredAndSellerPaid"
   ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NftAuctionCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SaleCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WhitelistedBuyerUpdated"): EventFragment;
 }
 
 export type AuctionPeriodUpdatedEvent = TypedEvent<
@@ -226,12 +284,28 @@ export type BidWithdrawnEvent = TypedEvent<
 
 export type BidWithdrawnEventFilter = TypedEventFilter<BidWithdrawnEvent>;
 
+export type BuyNowPriceUpdatedEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  { nftContractAddress: string; tokenId: BigNumber; newBuyNowPrice: BigNumber }
+>;
+
+export type BuyNowPriceUpdatedEventFilter =
+  TypedEventFilter<BuyNowPriceUpdatedEvent>;
+
 export type HighestBidTakenEvent = TypedEvent<
   [string, BigNumber],
   { nftContractAddress: string; tokenId: BigNumber }
 >;
 
 export type HighestBidTakenEventFilter = TypedEventFilter<HighestBidTakenEvent>;
+
+export type MinimumPriceUpdatedEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  { nftContractAddress: string; tokenId: BigNumber; newMinPrice: BigNumber }
+>;
+
+export type MinimumPriceUpdatedEventFilter =
+  TypedEventFilter<MinimumPriceUpdatedEvent>;
 
 export type NFTTransferredAndSellerPaidEvent = TypedEvent<
   [string, BigNumber, string, BigNumber, string, string],
@@ -269,7 +343,7 @@ export type NftAuctionCreatedEvent = TypedEvent<
     minPrice: BigNumber;
     buyNowPrice: BigNumber;
     auctionBidPeriod: number;
-    bidIncreaseRate: number;
+    bidIncreasePercentage: number;
     feeRecipients: string[];
     feePercentages: number[];
   }
@@ -277,6 +351,34 @@ export type NftAuctionCreatedEvent = TypedEvent<
 
 export type NftAuctionCreatedEventFilter =
   TypedEventFilter<NftAuctionCreatedEvent>;
+
+export type SaleCreatedEvent = TypedEvent<
+  [string, BigNumber, string, string, BigNumber, string, string[], number[]],
+  {
+    nftContractAddress: string;
+    tokenId: BigNumber;
+    nftSeller: string;
+    erc20Token: string;
+    buyNowPrice: BigNumber;
+    whitelistedBuyer: string;
+    feeRecipients: string[];
+    feePercentages: number[];
+  }
+>;
+
+export type SaleCreatedEventFilter = TypedEventFilter<SaleCreatedEvent>;
+
+export type WhitelistedBuyerUpdatedEvent = TypedEvent<
+  [string, BigNumber, string],
+  {
+    nftContractAddress: string;
+    tokenId: BigNumber;
+    newWhitelistedBuyer: string;
+  }
+>;
+
+export type WhitelistedBuyerUpdatedEventFilter =
+  TypedEventFilter<WhitelistedBuyerUpdatedEvent>;
 
 export interface NFTAuction extends BaseContract {
   contractName: "NFTAuction";
@@ -319,6 +421,17 @@ export interface NFTAuction extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    createSale(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _erc20Token: string,
+      _buyNowPrice: BigNumberish,
+      _whitelistedBuyer: string,
+      _feeRecipients: string[],
+      _feePercentages: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     defaultAuctionBidPeriod(overrides?: CallOverrides): Promise<[number]>;
 
     defaultBidIncreasePercentage(overrides?: CallOverrides): Promise<[number]>;
@@ -342,9 +455,11 @@ export interface NFTAuction extends BaseContract {
 
     maximumMinPricePercentage(overrides?: CallOverrides): Promise<[number]>;
 
-    minimumBidPercentage(overrides?: CallOverrides): Promise<[number]>;
+    minimumSettableIncreasePercentage(
+      overrides?: CallOverrides
+    ): Promise<[number]>;
 
-    nftAuctions(
+    nftContractAuctions(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -359,9 +474,10 @@ export interface NFTAuction extends BaseContract {
         string,
         string,
         string,
+        string,
         string
       ] & {
-        bidIncreaseRate: number;
+        bidIncreasePercentage: number;
         auctionBidPeriod: number;
         auctionEnd: BigNumber;
         minPrice: BigNumber;
@@ -369,10 +485,19 @@ export interface NFTAuction extends BaseContract {
         nftHighestBid: BigNumber;
         nftHighestBidder: string;
         nftSeller: string;
+        whitelistedBuyer: string;
         nftRecipient: string;
         ERC20Token: string;
       }
     >;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     ownerOfNFT(
       _nftContractAddress: string,
@@ -389,6 +514,27 @@ export interface NFTAuction extends BaseContract {
     takeHighestBid(
       _nftContractAddress: string,
       _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateBuyNowPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newBuyNowPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateMinimumPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newMinPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateWhitelistedBuyer(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newWhitelistedBuyer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -422,6 +568,17 @@ export interface NFTAuction extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  createSale(
+    _nftContractAddress: string,
+    _tokenId: BigNumberish,
+    _erc20Token: string,
+    _buyNowPrice: BigNumberish,
+    _whitelistedBuyer: string,
+    _feeRecipients: string[],
+    _feePercentages: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   defaultAuctionBidPeriod(overrides?: CallOverrides): Promise<number>;
 
   defaultBidIncreasePercentage(overrides?: CallOverrides): Promise<number>;
@@ -445,9 +602,9 @@ export interface NFTAuction extends BaseContract {
 
   maximumMinPricePercentage(overrides?: CallOverrides): Promise<number>;
 
-  minimumBidPercentage(overrides?: CallOverrides): Promise<number>;
+  minimumSettableIncreasePercentage(overrides?: CallOverrides): Promise<number>;
 
-  nftAuctions(
+  nftContractAuctions(
     arg0: string,
     arg1: BigNumberish,
     overrides?: CallOverrides
@@ -462,9 +619,10 @@ export interface NFTAuction extends BaseContract {
       string,
       string,
       string,
+      string,
       string
     ] & {
-      bidIncreaseRate: number;
+      bidIncreasePercentage: number;
       auctionBidPeriod: number;
       auctionEnd: BigNumber;
       minPrice: BigNumber;
@@ -472,10 +630,19 @@ export interface NFTAuction extends BaseContract {
       nftHighestBid: BigNumber;
       nftHighestBidder: string;
       nftSeller: string;
+      whitelistedBuyer: string;
       nftRecipient: string;
       ERC20Token: string;
     }
   >;
+
+  onERC721Received(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    arg3: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   ownerOfNFT(
     _nftContractAddress: string,
@@ -492,6 +659,27 @@ export interface NFTAuction extends BaseContract {
   takeHighestBid(
     _nftContractAddress: string,
     _tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateBuyNowPrice(
+    _nftContractAddress: string,
+    _tokenId: BigNumberish,
+    _newBuyNowPrice: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateMinimumPrice(
+    _nftContractAddress: string,
+    _tokenId: BigNumberish,
+    _newMinPrice: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateWhitelistedBuyer(
+    _nftContractAddress: string,
+    _tokenId: BigNumberish,
+    _newWhitelistedBuyer: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -525,6 +713,17 @@ export interface NFTAuction extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    createSale(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _erc20Token: string,
+      _buyNowPrice: BigNumberish,
+      _whitelistedBuyer: string,
+      _feeRecipients: string[],
+      _feePercentages: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     defaultAuctionBidPeriod(overrides?: CallOverrides): Promise<number>;
 
     defaultBidIncreasePercentage(overrides?: CallOverrides): Promise<number>;
@@ -548,9 +747,11 @@ export interface NFTAuction extends BaseContract {
 
     maximumMinPricePercentage(overrides?: CallOverrides): Promise<number>;
 
-    minimumBidPercentage(overrides?: CallOverrides): Promise<number>;
+    minimumSettableIncreasePercentage(
+      overrides?: CallOverrides
+    ): Promise<number>;
 
-    nftAuctions(
+    nftContractAuctions(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -565,9 +766,10 @@ export interface NFTAuction extends BaseContract {
         string,
         string,
         string,
+        string,
         string
       ] & {
-        bidIncreaseRate: number;
+        bidIncreasePercentage: number;
         auctionBidPeriod: number;
         auctionEnd: BigNumber;
         minPrice: BigNumber;
@@ -575,10 +777,19 @@ export interface NFTAuction extends BaseContract {
         nftHighestBid: BigNumber;
         nftHighestBidder: string;
         nftSeller: string;
+        whitelistedBuyer: string;
         nftRecipient: string;
         ERC20Token: string;
       }
     >;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     ownerOfNFT(
       _nftContractAddress: string,
@@ -595,6 +806,27 @@ export interface NFTAuction extends BaseContract {
     takeHighestBid(
       _nftContractAddress: string,
       _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateBuyNowPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newBuyNowPrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateMinimumPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newMinPrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateWhitelistedBuyer(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newWhitelistedBuyer: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -675,6 +907,17 @@ export interface NFTAuction extends BaseContract {
       highestBidder?: null
     ): BidWithdrawnEventFilter;
 
+    "BuyNowPriceUpdated(address,uint256,uint128)"(
+      nftContractAddress?: null,
+      tokenId?: null,
+      newBuyNowPrice?: null
+    ): BuyNowPriceUpdatedEventFilter;
+    BuyNowPriceUpdated(
+      nftContractAddress?: null,
+      tokenId?: null,
+      newBuyNowPrice?: null
+    ): BuyNowPriceUpdatedEventFilter;
+
     "HighestBidTaken(address,uint256)"(
       nftContractAddress?: null,
       tokenId?: null
@@ -683,6 +926,17 @@ export interface NFTAuction extends BaseContract {
       nftContractAddress?: null,
       tokenId?: null
     ): HighestBidTakenEventFilter;
+
+    "MinimumPriceUpdated(address,uint256,uint256)"(
+      nftContractAddress?: null,
+      tokenId?: null,
+      newMinPrice?: null
+    ): MinimumPriceUpdatedEventFilter;
+    MinimumPriceUpdated(
+      nftContractAddress?: null,
+      tokenId?: null,
+      newMinPrice?: null
+    ): MinimumPriceUpdatedEventFilter;
 
     "NFTTransferredAndSellerPaid(address,uint256,address,uint128,address,address)"(
       nftContractAddress?: null,
@@ -709,7 +963,7 @@ export interface NFTAuction extends BaseContract {
       minPrice?: null,
       buyNowPrice?: null,
       auctionBidPeriod?: null,
-      bidIncreaseRate?: null,
+      bidIncreasePercentage?: null,
       feeRecipients?: null,
       feePercentages?: null
     ): NftAuctionCreatedEventFilter;
@@ -721,10 +975,42 @@ export interface NFTAuction extends BaseContract {
       minPrice?: null,
       buyNowPrice?: null,
       auctionBidPeriod?: null,
-      bidIncreaseRate?: null,
+      bidIncreasePercentage?: null,
       feeRecipients?: null,
       feePercentages?: null
     ): NftAuctionCreatedEventFilter;
+
+    "SaleCreated(address,uint256,address,address,uint128,address,address[],uint32[])"(
+      nftContractAddress?: null,
+      tokenId?: null,
+      nftSeller?: null,
+      erc20Token?: null,
+      buyNowPrice?: null,
+      whitelistedBuyer?: null,
+      feeRecipients?: null,
+      feePercentages?: null
+    ): SaleCreatedEventFilter;
+    SaleCreated(
+      nftContractAddress?: null,
+      tokenId?: null,
+      nftSeller?: null,
+      erc20Token?: null,
+      buyNowPrice?: null,
+      whitelistedBuyer?: null,
+      feeRecipients?: null,
+      feePercentages?: null
+    ): SaleCreatedEventFilter;
+
+    "WhitelistedBuyerUpdated(address,uint256,address)"(
+      nftContractAddress?: null,
+      tokenId?: null,
+      newWhitelistedBuyer?: null
+    ): WhitelistedBuyerUpdatedEventFilter;
+    WhitelistedBuyerUpdated(
+      nftContractAddress?: null,
+      tokenId?: null,
+      newWhitelistedBuyer?: null
+    ): WhitelistedBuyerUpdatedEventFilter;
   };
 
   estimateGas: {
@@ -736,6 +1022,17 @@ export interface NFTAuction extends BaseContract {
       _buyNowPrice: BigNumberish,
       _auctionBidPeriod: BigNumberish,
       _bidIncreasePercentage: BigNumberish,
+      _feeRecipients: string[],
+      _feePercentages: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    createSale(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _erc20Token: string,
+      _buyNowPrice: BigNumberish,
+      _whitelistedBuyer: string,
       _feeRecipients: string[],
       _feePercentages: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -764,12 +1061,22 @@ export interface NFTAuction extends BaseContract {
 
     maximumMinPricePercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
-    minimumBidPercentage(overrides?: CallOverrides): Promise<BigNumber>;
+    minimumSettableIncreasePercentage(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    nftAuctions(
+    nftContractAuctions(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     ownerOfNFT(
@@ -787,6 +1094,27 @@ export interface NFTAuction extends BaseContract {
     takeHighestBid(
       _nftContractAddress: string,
       _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateBuyNowPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newBuyNowPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateMinimumPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newMinPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateWhitelistedBuyer(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newWhitelistedBuyer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -821,6 +1149,17 @@ export interface NFTAuction extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    createSale(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _erc20Token: string,
+      _buyNowPrice: BigNumberish,
+      _whitelistedBuyer: string,
+      _feeRecipients: string[],
+      _feePercentages: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     defaultAuctionBidPeriod(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -850,14 +1189,22 @@ export interface NFTAuction extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    minimumBidPercentage(
+    minimumSettableIncreasePercentage(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    nftAuctions(
+    nftContractAuctions(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     ownerOfNFT(
@@ -875,6 +1222,27 @@ export interface NFTAuction extends BaseContract {
     takeHighestBid(
       _nftContractAddress: string,
       _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateBuyNowPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newBuyNowPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateMinimumPrice(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newMinPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateWhitelistedBuyer(
+      _nftContractAddress: string,
+      _tokenId: BigNumberish,
+      _newWhitelistedBuyer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
